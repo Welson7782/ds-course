@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>家电维修教学系统</title>
+<style>
+:root{
+  --bg:#F5F7FA;--bg2:#FFFFFF;--bg3:#EEF1F6;
+  --text:#1C1F26;--text2:#5A6070;--text3:#9AA0AD;
+  --border:#DDE2EA;--border2:#BCC3CF;
+  --blue:#1558B0;--blue-bg:#EBF1FF;--blue-lt:#C9DDFF;
+  --green:#1A6E45;--green-bg:#E6F5EE;
+  --red:#B52A1C;--red-bg:#FDEEEC;--red-bd:#F5B7B1;
+  --amber:#8C5510;--amber-bg:#FEF5E7;
+  --purple:#4E30A0;--purple-bg:#F0ECFF;
+  --teal:#0B6E82;--teal-bg:#E0F5FA;
+  --r:10px;--r-lg:14px;--r-xl:18px;
+  --shadow:0 1px 4px rgba(0,0,0,0.08),0 4px 16px rgba(0,0,0,0.05);
+  --shadow-lg:0 4px 24px rgba(0,0,0,0.12);
+  --touch:48px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100vh;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif;color:var(--text);line-height:1.6;font-size:16px;-webkit-text-size-adjust:100%}
+button{font-family:inherit;cursor:pointer;-webkit-appearance:none;border:none}
+input,select,textarea{font-family:inherit;font-size:16px;-webkit-appearance:none}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:var(--bg2);border-bottom:1px solid var(--border);min-height:54px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;box-shadow:0 1px 6px rgba(0,0,0,0.07)}
+.nav-brand{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden}
+.nav-brand span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.lang-wrap{display:flex;background:var(--bg3);border-radius:8px;padding:3px;gap:2px}
+.lang-btn{padding:4px 10px;border-radius:6px;background:transparent;font-size:12px;font-weight:600;color:var(--text2);min-height:32px}
+.lang-btn.on{background:var(--bg2);color:var(--blue);box-shadow:0 1px 4px rgba(0,0,0,0.10)}
+.logout-btn{display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:8px;border:1px solid var(--red-bd);font-size:13px;color:var(--red);background:transparent;min-height:var(--touch);white-space:nowrap}
+
+/* MAIN */
+.main{padding:16px 14px;max-width:880px;margin:0 auto}
+
+/* LOGIN */
+.login-wrap{max-width:420px;margin:16px auto}
+.login-card{background:var(--bg2);border-radius:var(--r-xl);border:1px solid var(--border);padding:24px 20px;box-shadow:var(--shadow)}
+.login-logo{text-align:center;margin-bottom:20px}
+.login-logo .logo-icon{font-size:40px;display:block;margin-bottom:6px}
+.login-logo h2{font-size:20px;font-weight:700}
+.login-logo p{font-size:14px;color:var(--text2);margin-top:4px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px}
+.field input{width:100%;padding:12px 14px;border:1.5px solid var(--border2);border-radius:var(--r);font-size:16px;background:var(--bg);color:var(--text);outline:none}
+.field input:focus{border-color:var(--blue);background:var(--bg2)}
+.login-btn{width:100%;padding:14px;border-radius:var(--r);background:var(--blue);color:#fff;font-size:16px;font-weight:700;min-height:var(--touch)}
+.login-btn:active{background:#0D429E}
+.err-box{background:var(--red-bg);border:1px solid var(--red-bd);color:var(--red);padding:10px 14px;border-radius:var(--r);font-size:14px;margin-bottom:14px}
+.hint-box{margin-top:16px;background:var(--bg3);border-radius:var(--r);padding:12px}
+.hint-title{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px}
+.hint-row{display:flex;align-items:center;gap:8px;padding:10px 8px;border-radius:8px;cursor:pointer;flex-wrap:wrap;min-height:var(--touch)}
+.hint-row:active{background:var(--bg2)}
+.badge{display:inline-flex;font-size:12px;font-weight:700;padding:3px 8px;border-radius:5px}
+.badge-principal{background:var(--purple-bg);color:var(--purple)}
+.badge-admin{background:var(--amber-bg);color:var(--amber)}
+.badge-member{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+.hint-em{font-family:monospace;font-size:13px;color:var(--blue)}
+.hint-note{font-size:12px;color:var(--text3)}
+.hint-nda{font-size:12px;color:var(--green);font-weight:600}
+
+/* NDA */
+.nda-page{max-width:600px;margin:0 auto}
+.nda-alert{background:var(--red-bg);border:1px solid var(--red-bd);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start}
+.nda-alert-icon{font-size:24px;flex-shrink:0}
+.nda-alert h3{font-size:15px;font-weight:700;color:var(--red);margin-bottom:4px}
+.nda-alert p{font-size:13px;color:#8B2019;line-height:1.6}
+.nda-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow)}
+.nda-card-hdr{padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--border);font-size:14px;font-weight:700}
+.nda-clauses{padding:14px 16px;max-height:260px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.nda-clause{border-left:3px solid var(--red);padding:10px 12px;background:var(--bg3);border-radius:0 8px 8px 0;margin-bottom:10px;font-size:14px;line-height:1.8;color:var(--text2)}
+.nda-clause:last-child{margin-bottom:0}
+.nda-clause strong{color:var(--text);display:block;margin-bottom:3px}
+.nda-agree-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;box-shadow:var(--shadow)}
+.nda-chk-row{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:var(--r);border:1.5px solid var(--border);margin-bottom:10px;cursor:pointer}
+.nda-chk-row:active{border-color:var(--blue);background:var(--blue-bg)}
+.nda-chk-row input[type=checkbox]{width:20px;height:20px;flex-shrink:0;margin-top:2px;accent-color:var(--blue)}
+.nda-chk-lbl{font-size:14px;line-height:1.7;cursor:pointer}
+.nda-agree-btn{width:100%;padding:14px;border-radius:var(--r);background:var(--blue);color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;min-height:var(--touch)}
+.nda-agree-btn:disabled{background:var(--bg3);color:var(--text3)}
+.nda-session-note{font-size:13px;color:var(--text3);text-align:center;margin-top:10px}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:12px 14px;font-size:13px;font-weight:600;border:none;border-bottom:2.5px solid transparent;color:var(--text2);background:transparent;white-space:nowrap;display:flex;align-items:center;gap:5px;min-height:var(--touch)}
+.tab.on{color:var(--blue);border-bottom-color:var(--blue)}
+
+/* CARD / TABLE */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;min-width:480px}
+thead tr{background:var(--bg3)}
+th{font-size:11px;font-weight:700;color:var(--text2);padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+td{padding:12px 12px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+.st-on{background:var(--green-bg);color:var(--green);padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:4px}
+.st-off{background:var(--red-bg);color:var(--red);padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:4px}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.dot-on{background:var(--green)}.dot-off{background:var(--red)}
+.paid-y{background:var(--green-bg);color:var(--green);padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:3px}
+.paid-n{background:var(--amber-bg);color:var(--amber);padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:3px}
+.act-btn{font-size:13px;padding:8px 12px;border-radius:8px;border:1.5px solid var(--border2);background:transparent;margin-right:4px;white-space:nowrap;font-weight:600;min-height:var(--touch);display:inline-flex;align-items:center;gap:4px}
+.act-btn.g{border-color:#7EC8A0;color:var(--green)}.act-btn.g:active{background:var(--green-bg)}
+.act-btn.r{border-color:var(--red-bd);color:var(--red)}.act-btn.r:active{background:var(--red-bg)}
+.act-btn.b{border-color:#90BAF0;color:var(--blue)}.act-btn.b:active{background:var(--blue-bg)}
+.act-btn.a{border-color:#F0C88A;color:var(--amber)}.act-btn.a:active{background:var(--amber-bg)}
+.tip-box{background:var(--blue-bg);border:1px solid var(--blue-lt);border-radius:var(--r);padding:12px 14px;font-size:13px;color:var(--blue);margin-top:12px;display:flex;gap:8px;align-items:flex-start;line-height:1.6}
+
+/* TAGS */
+.tag{font-size:12px;font-weight:700;padding:3px 8px;border-radius:5px;display:inline-block}
+.tw{background:var(--blue-bg);color:var(--blue)}
+.tf{background:var(--teal-bg);color:var(--teal)}
+.tb{background:var(--purple-bg);color:var(--purple)}
+.ti2{background:var(--amber-bg);color:var(--amber)}
+.tp{background:var(--red-bg);color:var(--red)}
+.done-pill{background:var(--green-bg);color:var(--green);font-size:12px;font-weight:700;padding:3px 9px;border-radius:5px;display:inline-flex;align-items:center;gap:3px}
+.lock-pill{background:var(--bg3);color:var(--text3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:5px;display:inline-flex;align-items:center;gap:3px}
+.nda-pill{background:var(--blue-bg);color:var(--blue);font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:4px}
+
+/* MEMBER HDR */
+.mem-hdr{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--shadow)}
+.lv-pill{font-size:13px;font-weight:700;padding:5px 14px;border-radius:20px}
+.lv-basic{background:var(--purple-bg);color:var(--purple)}
+.lv-inter{background:var(--amber-bg);color:var(--amber)}
+.lv-pro{background:var(--red-bg);color:var(--red)}
+.prog-wrap{height:7px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-top:6px}
+.prog-fill{height:100%;border-radius:4px;background:var(--blue)}
+.prog-fill.done{background:var(--green)}
+
+/* COURSE GRID */
+.lv-group{margin-bottom:20px}
+.lv-lbl{font-size:13px;font-weight:700;padding:6px 14px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;margin-bottom:12px}
+.ll-basic{background:var(--purple-bg);color:var(--purple)}
+.ll-inter{background:var(--amber-bg);color:var(--amber)}
+.ll-pro{background:var(--red-bg);color:var(--red)}
+.course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+@media(max-width:500px){.course-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:360px){.course-grid{grid-template-columns:1fr}}
+.ccard{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.ccard.click{cursor:pointer}
+.ccard.click:active{border-color:#90BAF0;transform:scale(0.98)}
+.ccard.locked{opacity:.5}
+.cthumb{height:80px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--border);font-size:36px}
+.ct-wash{background:linear-gradient(135deg,#EBF1FF,#C9DDFF)}
+.ct-fridge{background:linear-gradient(135deg,#E0F5FA,#B2EBF2)}
+.cbody{padding:12px;flex:1;display:flex;flex-direction:column;gap:6px}
+.ctags{display:flex;gap:5px;flex-wrap:wrap}
+.ctitle{font-size:13px;font-weight:700;line-height:1.4}
+.learn-btn{margin-top:auto;padding:10px;border-radius:8px;border:1.5px solid var(--border2);background:transparent;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px;min-height:var(--touch)}
+.learn-btn:active:not(:disabled){background:var(--blue-bg);border-color:#90BAF0;color:var(--blue)}
+.learn-btn:disabled{opacity:.4}
+
+/* DETAIL */
+.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--text2);padding:8px 0;margin-bottom:14px;background:none;border:none;min-height:var(--touch)}
+.detail-title{font-size:18px;font-weight:700;line-height:1.4;margin-bottom:14px}
+@media(max-width:480px){.detail-title{font-size:16px}}
+.detail-layout{display:grid;grid-template-columns:1fr 260px;gap:16px;align-items:start}
+@media(max-width:700px){.detail-layout{grid-template-columns:1fr}}
+
+/* VIDEO LANG SWITCHER */
+.vlang-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.vlang-label{font-size:13px;font-weight:700;color:var(--text2);white-space:nowrap}
+.vlang-btn{padding:8px 14px;border-radius:20px;border:1.5px solid var(--border2);background:var(--bg2);font-size:13px;font-weight:600;color:var(--text2);min-height:40px}
+.vlang-btn.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.vlang-btn:active:not(.on){background:var(--blue-bg)}
+
+/* VIDEO */
+.video-wrap{background:#000;border-radius:var(--r-lg);overflow:hidden;position:relative;width:100%;padding-top:56.25%;margin-bottom:12px}
+.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+.no-video-box{background:#151c28;border-radius:var(--r-lg);padding:28px 20px;text-align:center;margin-bottom:12px}
+.no-video-box .nv-icon{font-size:36px;display:block;margin-bottom:10px}
+.no-video-box p{font-size:14px;color:#8899aa;line-height:1.7}
+.no-video-box b{color:#7dc8e3}
+
+/* VIDEO UPLOAD (admin) */
+.upload-info{background:var(--blue-bg);border:1px solid var(--blue-lt);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:16px}
+.upload-info h3{font-size:14px;font-weight:700;color:var(--blue);margin-bottom:6px}
+.upload-info p{font-size:13px;color:var(--blue);line-height:1.6;margin-bottom:4px}
+.upload-form{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;margin-top:14px;box-shadow:var(--shadow)}
+.upload-form h3{font-size:15px;font-weight:700;margin-bottom:14px}
+.vlang-section{background:var(--blue-bg);border:1px solid var(--blue-lt);border-radius:var(--r);padding:14px;margin-bottom:14px}
+.vlang-section h4{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:12px}
+.vlang-row{margin-bottom:10px}
+.vlang-row:last-child{margin-bottom:0}
+.vlang-row label{display:block;font-size:13px;font-weight:700;color:var(--text2);margin-bottom:5px}
+.vlang-row input{width:100%;padding:10px 12px;border:1.5px solid var(--border2);border-radius:var(--r);font-size:16px;background:var(--bg);color:var(--text);outline:none;font-family:monospace}
+.vlang-row input:focus{border-color:var(--blue)}
+.yt-badge{display:inline-flex;align-items:center;gap:4px;font-family:monospace;font-size:12px;padding:3px 8px;border-radius:4px}
+.yt-badge.has{background:var(--green-bg);color:var(--green)}
+.yt-badge.no{background:var(--red-bg);color:var(--red)}
+.save-btn{padding:12px 20px;border-radius:var(--r);background:var(--blue);color:#fff;font-size:14px;font-weight:700;min-height:var(--touch)}
+.cancel-btn{padding:12px 16px;border-radius:var(--r);border:1.5px solid var(--border2);background:transparent;font-size:14px;color:var(--text2);margin-right:8px;min-height:var(--touch)}
+.ff label{display:block;font-size:13px;font-weight:700;color:var(--text2);margin-bottom:5px}
+.ff input,.ff select,.ff textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border2);border-radius:var(--r);font-size:16px;background:var(--bg);color:var(--text);outline:none}
+.ff textarea{resize:vertical;min-height:60px;line-height:1.5}
+
+/* WATCHED BOX */
+.watch-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow)}
+.watch-hdr{padding:12px 14px;background:var(--bg3);border-bottom:1px solid var(--border);font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
+.watch-body{padding:14px}
+.watch-desc{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:12px}
+.wchk{display:flex;align-items:flex-start;gap:12px;padding:12px;border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer;margin-bottom:8px;min-height:var(--touch)}
+.wchk:active{border-color:var(--blue);background:var(--blue-bg)}
+.wchk input[type=checkbox]{width:20px;height:20px;flex-shrink:0;margin-top:2px;accent-color:var(--blue)}
+.wchk-lbl{font-size:14px;line-height:1.6;cursor:pointer}
+.confirm-btn{width:100%;padding:14px;border-radius:var(--r);background:var(--blue);color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:10px;min-height:var(--touch)}
+.confirm-btn:disabled{background:var(--bg3);color:var(--text3)}
+.done-box{background:var(--green-bg);border:1px solid #7EC8A0;border-radius:var(--r-lg);padding:14px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.done-box .done-ico{font-size:28px}
+.done-box strong{font-size:14px;color:var(--green);display:block}
+.done-box small{font-size:13px;color:#2E7D52}
+
+/* KP */
+.kp-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;margin-bottom:14px;box-shadow:var(--shadow)}
+.kp-card h4{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.kp-item{display:flex;gap:8px;align-items:flex-start;padding:6px 0;font-size:14px;line-height:1.5;border-bottom:1px solid var(--border)}
+.kp-item:last-child{border-bottom:none}
+.kp-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:6px}
+.desc-card{background:var(--bg3);border-radius:var(--r);padding:14px;font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:14px}
+
+/* NAV BTNS */
+.nav-btns{display:flex;gap:10px;margin-bottom:6px}
+.nav-btn{flex:1;padding:12px;border-radius:var(--r);border:1.5px solid var(--border2);background:var(--bg2);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px;min-height:var(--touch)}
+.nav-btn:disabled{opacity:.35}
+.nav-btn.nxt{background:var(--blue);color:#fff;border-color:var(--blue)}
+.nav-btn.nxt:active:not(:disabled){background:#0D429E}
+
+/* PROGRESS */
+.prg-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow)}
+.prg-hdr{padding:12px 14px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.prg-body{padding:12px 14px}
+.prg-tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:380px}
+.prg-tbl th{font-size:11px;font-weight:700;color:var(--text2);padding:6px 8px;text-align:left;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.04em}
+.prg-tbl td{padding:8px 8px;border-bottom:1px solid var(--border)}
+.prg-tbl tr:last-child td{border-bottom:none}
+
+/* PAY MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center;z-index:200;padding:0}
+@media(min-width:500px){.modal-ov{align-items:center;padding:16px}}
+.modal{background:var(--bg2);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:24px 20px 32px;width:100%;max-width:420px;box-shadow:var(--shadow-lg)}
+@media(min-width:500px){.modal{border-radius:var(--r-xl);padding:22px 20px}}
+.modal h3{font-size:17px;font-weight:700;margin-bottom:16px}
+.mf{margin-bottom:12px}
+.mf label{display:block;font-size:14px;font-weight:700;color:var(--text2);margin-bottom:5px}
+.mf input,.mf select{width:100%;padding:12px 14px;border:1.5px solid var(--border2);border-radius:var(--r);font-size:16px;background:var(--bg);color:var(--text);outline:none}
+.modal-acts{display:flex;gap:10px;margin-top:18px}
+.btn-pri{flex:1;padding:13px;border-radius:var(--r);background:var(--blue);color:#fff;font-size:15px;font-weight:700;min-height:var(--touch)}
+.btn-sec{padding:13px 16px;border-radius:var(--r);border:1.5px solid var(--border2);background:transparent;font-size:15px;color:var(--text2);min-height:var(--touch)}
+.adm-hdr{margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px}
+.adm-hdr h2{font-size:18px;font-weight:700}
+.empty{text-align:center;padding:40px 20px;color:var(--text2);font-size:14px}
+.fw{font-weight:700}
+.mono{font-family:monospace;font-size:12px;color:var(--text3)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+var LW={basic:1,intermediate:2,professional:3};
+
+var COURSES=[
+  {id:'c1',cat:'washing',level:'basic',icon:'🧺',
+   ytId:{cn:'qp0ZNJAN6tA',en:'qp0ZNJAN6tA',bm:'qp0ZNJAN6tA'},
+   title:{cn:'洗衣机进水阀检测与更换',en:'Washing Machine Inlet Valve Diagnosis & Replacement',bm:'Diagnosis & Penggantian Injap Masuk Mesin Basuh'},
+   desc:{cn:'本课程适合零基础学员。你将学会用万用表检测进水阀线圈阻值，判断是否断路或短路，并完成整个拆装更换流程。课后能独立处理洗衣机不进水、进水缓慢等常见故障。',
+         en:'Suitable for beginners. Learn to use a multimeter to test inlet valve coil resistance, identify open or short circuits, and complete the full disassembly and replacement process.',
+         bm:'Sesuai untuk pemula. Belajar menggunakan multimeter untuk menguji rintangan gegelung injap masuk dan menyelesaikan proses penggantian.'},
+   kp:{cn:['万用表欧姆档基本操作','进水阀正常阻值范围（500Ω–1.5kΩ）','断路/短路判断方法','进水阀拆装工具与步骤','故障代码与症状对照表'],
+       en:['Basic multimeter resistance mode','Normal coil resistance 500Ω–1.5kΩ','Open vs short circuit detection','Tools and steps for replacement','Fault code vs symptom reference'],
+       bm:['Operasi asas multimeter','Julat rintangan normal 500Ω–1.5kΩ','Mengenal pasti litar terbuka vs pintas','Alatan dan langkah penggantian','Rujukan kod ralat vs simptom']}},
+  {id:'c2',cat:'fridge',level:'basic',icon:'❄️',
+   ytId:{cn:'oPmr6boufmE',en:'oPmr6boufmE',bm:'oPmr6boufmE'},
+   title:{cn:'冰箱不制冷基础排查思路',en:'Refrigerator Not Cooling — Basic Troubleshooting',bm:'Peti Sejuk Tidak Sejuk — Penyelesaian Masalah Asas'},
+   desc:{cn:'掌握冰箱不制冷的系统性排查方法。从门封条、温控器开始，逐步检查压缩机启动、风扇运转，建立正确的故障排查逻辑树。适合刚入行的维修新手。',
+         en:'Master a systematic approach to diagnosing a fridge that is not cooling. Start from door seals and thermostats, progress to compressor startup and fan operation.',
+         bm:'Kuasai pendekatan sistematik dari pengedap pintu sehingga pemampat.'},
+   kp:{cn:['门封条气密性快速检测','温控器手动触发测试','压缩机启动电流测量','冷凝风扇与蒸发风扇区别','制冷不足 vs 完全不制冷'],
+       en:['Quick door seal test','Manual thermostat trigger test','Compressor startup current','Condenser vs evaporator fan','Insufficient vs complete failure'],
+       bm:['Ujian pengedap pintu','Ujian termostat manual','Arus permulaan pemampat','Kipas kondenser vs penyejat','Kegagalan separa vs lengkap']}},
+  {id:'c3',cat:'washing',level:'intermediate',icon:'⚙️',
+   ytId:{cn:'V-SyKZTnrb8',en:'V-SyKZTnrb8',bm:'V-SyKZTnrb8'},
+   title:{cn:'变频洗衣机BLDC电机驱动板维修',en:'Inverter Washer BLDC Motor Driver Board Repair',bm:'Pembaikan Papan Pemacu Motor BLDC Mesin Basuh Inverter'},
+   desc:{cn:'深入讲解变频洗衣机无刷直流电机工作原理与驱动板常见故障。重点包括IPM模块检测、霍尔传感器信号测量、MOSFET更换及示波器观察三相PWM波形。',
+         en:'Covers BLDC motor working principles and common driver board failures including IPM module testing, Hall sensor measurement, MOSFET replacement and PWM waveform observation.',
+         bm:'Merangkumi prinsip kerja motor BLDC dan kerosakan papan pemacu biasa termasuk ujian modul IPM dan penggantian MOSFET.'},
+   kp:{cn:['BLDC电机三相驱动原理','IPM模块判断（静态测量法）','霍尔传感器信号波形标准','MOSFET更换注意事项','示波器测量PWM信号实操'],
+       en:['BLDC three-phase drive principles','IPM module static measurement test','Hall sensor waveform standards','MOSFET replacement precautions','Oscilloscope PWM measurement'],
+       bm:['Prinsip pemacu tiga fasa BLDC','Ujian statik modul IPM','Piawaian bentuk gelombang sensor Hall','Langkah berjaga-jaga MOSFET','Pengukuran PWM dengan osiloskop']}},
+  {id:'c4',cat:'fridge',level:'intermediate',icon:'🔧',
+   ytId:{cn:'2baFLzjAn2Y',en:'2baFLzjAn2Y',bm:'2baFLzjAn2Y'},
+   title:{cn:'变频冰箱电子膨胀阀检测与维修',en:'Inverter Fridge Electronic Expansion Valve Testing & Repair',bm:'Ujian & Pembaikan Injap Pemuaian Elektronik Peti Sejuk Inverter'},
+   desc:{cn:'电子膨胀阀（EEV）是变频冰箱的核心制冷控制元件。本课教你用示波器检测步进电机驱动脉冲、手动控制EEV开度，区分机械卡死与驱动信号丢失两类故障。',
+         en:'The EEV is the core refrigerant control component. Teaches oscilloscope detection of stepper motor drive pulses and differentiating mechanical seizure from missing drive signals.',
+         bm:'EEV ialah komponen kawalan penyejuk teras. Mengajar pengesanan osiloskop dan membezakan kegagalan mekanikal dari isyarat hilang.'},
+   kp:{cn:['EEV步进电机驱动脉冲检测','EEV线圈阻值检测（60–80Ω）','手动强制控制EEV开度','主板EEV驱动电路分析','机械卡死 vs 信号丢失区分'],
+       en:['EEV stepper motor pulse detection','EEV coil resistance test (60–80Ω)','Manual EEV opening control','Mainboard EEV driver circuit analysis','Mechanical seizure vs missing signal'],
+       bm:['Pengesanan denyutan pemacu EEV','Ujian rintangan gegelung EEV (60–80Ω)','Kawalan paksa pembukaan EEV','Analisis litar pemacu EEV','Rampasan mekanikal vs isyarat hilang']}},
+  {id:'c5',cat:'washing',level:'professional',icon:'🖥️',
+   ytId:{cn:'Dy7LNevxfMI',en:'Dy7LNevxfMI',bm:'Dy7LNevxfMI'},
+   title:{cn:'高端DD直驱洗衣机主板级深度维修',en:'Premium DD Direct Drive Washer Mainboard-Level Deep Repair',bm:'Pembaikan Mendalam Peringkat Papan Induk Mesin Basuh DD Premium'},
+   desc:{cn:'专业班核心课，针对LG、三星等高端DD直驱洗衣机的主板级故障。涵盖IPM烧毁后主板元件级更换、三相反馈信号缺失分析、编码器信号异常处理，以及专用编程器刷写固件。',
+         en:'Core professional course for mainboard-level faults in premium DD direct drive washers (LG, Samsung). Covers board-level IPM replacement, missing three-phase motor feedback analysis, and reflashing motor control firmware.',
+         bm:'Kursus profesional teras untuk kerosakan peringkat papan induk dalam mesin basuh DD premium.'},
+   kp:{cn:['IPM烧毁后主板元件级更换','三相（U/V/W）反馈信号示波器分析','编码器脉冲计数异常排查','编程器刷写EEPROM固件','主板电源树诊断（5V/15V/310V）','错误代码LE/E6/E9深度解读'],
+       en:['Board-level IPM replacement after burnout','Three-phase (U/V/W) feedback oscilloscope analysis','Encoder pulse count anomaly diagnosis','EEPROM firmware reflashing','Power rail diagnostics (5V/15V/310V)','Deep interpretation of LE/E6/E9 codes'],
+       bm:['Penggantian IPM peringkat papan','Analisis osiloskop isyarat tiga fasa','Diagnosis anomali kiraan denyutan','Penulisan semula EEPROM','Diagnostik rel kuasa (5V/15V/310V)','Tafsiran mendalam kod LE/E6/E9']}},
+  {id:'c6',cat:'fridge',level:'professional',icon:'🔬',
+   ytId:{cn:'4_c978da0ZQ',en:'4_c978da0ZQ',bm:'4_c978da0ZQ'},
+   title:{cn:'双循环变频冰箱制冷系统全面诊断',en:'Dual-Loop Inverter Fridge Refrigeration System Full Diagnosis',bm:'Diagnosis Penuh Sistem Penyejukan Peti Sejuk Inverter Gelung Dwi'},
+   desc:{cn:'面向专业技师的高阶课程。深入讲解双压缩机双循环系统压力平衡、冷媒充注量精确计算、抽空作业规范，以及通过主板实时温度数据流分析故障根源，而非依赖表象症状。',
+         en:'Advanced course covering dual-compressor dual-loop pressure balance, precise refrigerant charge calculation, vacuum procedure standards, and mainboard real-time temperature data stream analysis.',
+         bm:'Kursus lanjutan merangkumi keseimbangan tekanan sistem dwi pemampat, pengiraan cas penyejuk tepat, dan analisis aliran data suhu masa nyata papan induk.'},
+   kp:{cn:['双循环系统压力平衡与异常判断','冷媒（R600a/R134a）充注量精确计算','抽空深度标准（目标≤500微米）','主板实时温度数据流分析','蒸发器结霜形态与泄漏位置判断','系统性能测试报告撰写规范'],
+       en:['Dual-loop pressure balance and anomaly detection','Refrigerant (R600a/R134a) charge calculation','Vacuum depth standards (≤500 microns)','Mainboard real-time temperature data analysis','Evaporator frost pattern and leak diagnosis','System performance test report standards'],
+       bm:['Keseimbangan tekanan sistem dwi gelung','Pengiraan cas penyejuk (R600a/R134a)','Piawaian kedalaman vakum (≤500 mikron)','Analisis aliran data suhu masa nyata','Diagnosis corak embun beku penyejat','Piawaian laporan ujian prestasi']}},
+];
+
+var USERS0=[
+  {id:'1',name:'校长',email:'admin@test.com',password:'admin123',role:'principal',level:'无',status:'ON',paid:true,paidDate:'—',paidAmount:'—',ndaCount:0},
+  {id:'2',name:'张三',email:'admin2@test.com',password:'admin123',role:'admin',level:'无',status:'ON',paid:true,paidDate:'—',paidAmount:'—',ndaCount:0},
+  {id:'3',name:'阿里',email:'ali@test.com',password:'user123',role:'member',level:'basic',status:'OFF',paid:false,paidDate:'',paidAmount:'',ndaCount:0},
+  {id:'4',name:'阿明',email:'amin@test.com',password:'user123',role:'member',level:'intermediate',status:'ON',paid:true,paidDate:'2025-03-10',paidAmount:'RM 299',ndaCount:3},
+  {id:'5',name:'陈老板',email:'chen@test.com',password:'user123',role:'member',level:'professional',status:'ON',paid:true,paidDate:'2025-01-05',paidAmount:'RM 599',ndaCount:7},
+];
+
+var TX={
+  cn:{t:'家电维修教学系统',login:'登录',logout:'退出',email:'电子邮箱',pw:'密码',on:'已开启',off:'已关闭',basic:'基础班',intermediate:'中级班',professional:'专业班',principal:'校长',admin:'管理员',member:'学员',noAuth:'账号未开启，请联系校长开通权限。',wrongPw:'邮箱或密码错误！',members:'学员管理',payment:'收款管理',prog:'学习进度',courses:'课程视频',paid:'已付款',unpaid:'未付款',markPaid:'标记付款',editPay:'编辑',revoke:'关闭权限',grant:'开启权限',addCourse:'上载视频',save:'保存',cancel:'取消',washing:'洗衣机',fridge:'冰箱',kp:'课程知识点',start:'开始学习',review:'重温课程',back:'返回',noCourse:'暂无符合等级的课程',superAdmin:'超级管理员',dash:'管理后台',curLv:'当前等级',fill:'点击账号快速填入',locked:'完成上一课后解锁',inactive:'未开通',nameL:'姓名',dateL:'付款日期',amtL:'金额',lvL:'课程等级',tipM:'开启权限后学员可登录查看课程；关闭后立即生效。',tipP:'标记付款仅记录收款状态，需手动到【学员管理】开启权限。',delQ:'确认删除此课程？',ndaT:'保密条款确认书',ndaSub:'每次登录须重新阅读并勾选同意，方可进入课程系统。',c1h:'一、保密义务',c1:'本系统内所有课程内容，包括但不限于视频、讲义、技术资料及知识点，均为本公司专有知识产权，严禁以任何形式对外传播、分享、录制、截图或转售。',c2h:'二、违规处罚',c2:'如会员违反保密义务，公司有权立即取消其学习资格。该行为等同于会员自动放弃学习资格，公司将保留追究相关法律责任之权利。',c3h:'三、学费不退',c3:'违规取消资格后，已缴纳之全部学费概不退还，不论已学习课程数量多少。',c4h:'四、适用范围',c4:'本条款适用于基础班、中级班、专业班全体学员，自首次勾选确认之日起永久生效，每次登录须再次确认以示知悉。',ckA:'本人已仔细阅读并完全理解以上四项保密条款，承诺严格遵守。',ckB:'本人知悉：如有违规，公司有权取消学习资格且学费不予退还，本人愿意承担一切后果。',agree:'我已阅读并同意，进入课程系统',wcT:'观看完成确认',wcD:'请在完整观看视频后勾选以下两项，方可确认完成并解锁下一课。',w1:'我已完整观看本节课程视频，没有跳过任何内容。',w2:'我已理解本节课程的全部知识点，承诺不对外泄露任何课程内容。',wcOk:'确认已看完并了解，解锁下一课',done:'本课已完成学习',doneAt:'完成日期',prev:'上一课',next:'下一课',ndaC:'条款勾选次数',progL:'完成进度',csL:'课程状态',watched:'已完成',unw:'未完成',noRec:'暂无学习记录',total:'共勾选条款',times:'次',vlL:'教学视频语言',noVidT:'此语言版本视频尚未上载',noVidD:'管理员正在准备该语言版本，请先选择其他语言版本或稍后再来。',editVid:'修改视频',vidStatus:'视频状态',cnV:'华语视频',enV:'英语视频',bmV:'马来语视频',uploadT:'上载课程视频',uploadD:'为每门课程分别填入三个语言版本的 YouTube 视频 ID。学员将根据所选语言自动看到对应版本。',ytHint:'从 YouTube 网址复制视频 ID，例：youtube.com/watch?v=ABC123xyz'},
+  en:{t:'Appliance Repair System',login:'Login',logout:'Logout',email:'Email',pw:'Password',on:'Active',off:'Inactive',basic:'Basic',intermediate:'Intermediate',professional:'Professional',principal:'Principal',admin:'Admin',member:'Member',noAuth:'Account inactive. Contact the Principal.',wrongPw:'Incorrect email or password.',members:'Members',payment:'Payments',prog:'Progress',courses:'Course Videos',paid:'Paid',unpaid:'Unpaid',markPaid:'Mark Paid',editPay:'Edit',revoke:'Revoke',grant:'Activate',addCourse:'Upload Video',save:'Save',cancel:'Cancel',washing:'Washer',fridge:'Fridge',kp:'Key Points',start:'Start Learning',review:'Review',back:'Back',noCourse:'No courses for your level',superAdmin:'Super admin',dash:'Admin Dashboard',curLv:'Your level',fill:'Click to auto-fill',locked:'Complete previous lesson to unlock',inactive:'Inactive',nameL:'Name',dateL:'Payment Date',amtL:'Amount',lvL:'Level',tipM:'Active members can log in and view courses. Revoking takes effect immediately.',tipP:'Marking paid only records payment status. Go to Members to manually activate access.',delQ:'Delete this course?',ndaT:'Confidentiality Agreement',ndaSub:'You must re-read and agree every login session before accessing courses.',c1h:'1. Confidentiality Obligation',c1:"All course content in this system is the company's exclusive intellectual property. Strictly prohibited to share, record, screenshot, or resell.",c2h:'2. Penalty for Violation',c2:'Violation results in immediate cancellation of learning access, deemed voluntary forfeiture with no appeal.',c3h:'3. No Refund',c3:'Upon cancellation due to violation, all fees paid are non-refundable regardless of lessons completed.',c4h:'4. Scope',c4:'Applies to all members across all levels. Must be re-confirmed each login session.',ckA:'I have carefully read and fully understood all four confidentiality clauses and commit to strict compliance.',ckB:'I acknowledge that violation results in immediate cancellation with no refund, and accept full responsibility.',agree:'I Agree — Enter Course System',wcT:'Lesson Completion Confirmation',wcD:'Please tick both boxes after fully watching the video to confirm completion and unlock the next lesson.',w1:'I have fully watched this lesson video without skipping any content.',w2:'I have understood all key points and commit not to share any course content externally.',wcOk:'Confirm Watched & Understood — Unlock Next',done:'Lesson Completed',doneAt:'Completed on',prev:'Previous',next:'Next Lesson',ndaC:'Agreement confirmations',progL:'Progress',csL:'Status',watched:'Completed',unw:'Not completed',noRec:'No learning records',total:'Total confirmations',times:'times',vlL:'Video Language',noVidT:'This language version is not yet uploaded',noVidD:'Admin is preparing this version. Please select another language or check back later.',editVid:'Edit Video',vidStatus:'Video Status',cnV:'Chinese Video',enV:'English Video',bmV:'Malay Video',uploadT:'Upload Course Videos',uploadD:'Enter the YouTube Video ID for each language version of each course. Members will automatically see the version matching their selected interface language.',ytHint:'Copy the Video ID from YouTube URL, e.g.: youtube.com/watch?v=ABC123xyz'},
+  bm:{t:'Sistem Latihan Pembaikan',login:'Log Masuk',logout:'Log Keluar',email:'E-mel',pw:'Kata Laluan',on:'Aktif',off:'Disekat',basic:'Asas',intermediate:'Pertengahan',professional:'Profesional',principal:'Guru Besar',admin:'Admin',member:'Ahli',noAuth:'Akaun tidak aktif. Hubungi Guru Besar.',wrongPw:'E-mel atau kata laluan salah.',members:'Ahli',payment:'Bayaran',prog:'Kemajuan',courses:'Video Kursus',paid:'Dibayar',unpaid:'Belum Bayar',markPaid:'Tandai Bayar',editPay:'Edit',revoke:'Nyahaktif',grant:'Aktifkan',addCourse:'Muat Naik Video',save:'Simpan',cancel:'Batal',washing:'Mesin Basuh',fridge:'Peti Sejuk',kp:'Poin Utama',start:'Mula Belajar',review:'Semak Semula',back:'Kembali',noCourse:'Tiada kursus untuk tahap anda',superAdmin:'Super admin',dash:'Papan Pemuka',curLv:'Tahap anda',fill:'Klik untuk isi kelayakan',locked:'Selesaikan pelajaran sebelumnya',inactive:'Tidak aktif',nameL:'Nama',dateL:'Tarikh Bayaran',amtL:'Jumlah',lvL:'Tahap',tipM:'Ahli aktif boleh log masuk. Penyahaktifan berkuat kuasa serta-merta.',tipP:'Menanda bayar hanya merekod status. Pergi ke Ahli untuk mengaktifkan.',delQ:'Padam kursus ini?',ndaT:'Perjanjian Kerahsiaan',ndaSub:'Anda mesti membaca dan bersetuju setiap kali log masuk sebelum memasuki kursus.',c1h:'1. Kewajipan Kerahsiaan',c1:'Semua kandungan kursus dalam sistem ini adalah harta intelek eksklusif syarikat. Dilarang keras berkongsi, merakam atau menjual semula.',c2h:'2. Penalti Pelanggaran',c2:'Pelanggaran mengakibatkan pembatalan akses serta-merta tanpa rayuan.',c3h:'3. Tiada Bayaran Balik',c3:'Setelah pembatalan akibat pelanggaran, semua yuran tidak boleh dikembalikan.',c4h:'4. Skop',c4:'Terpakai kepada semua ahli di semua peringkat dan mesti disahkan semula setiap log masuk.',ckA:'Saya telah membaca dan memahami sepenuhnya semua terma kerahsiaan dan komited untuk mematuhinya.',ckB:'Saya mengakui bahawa pelanggaran mengakibatkan pembatalan akses serta-merta tanpa bayaran balik.',agree:'Saya Bersetuju — Masuk Sistem Kursus',wcT:'Pengesahan Penyiapan Pelajaran',wcD:'Sila tandakan kedua-dua kotak selepas menonton video sepenuhnya untuk membuka kunci pelajaran seterusnya.',w1:'Saya telah menonton video pelajaran ini sepenuhnya tanpa melangkau mana-mana kandungan.',w2:'Saya telah memahami semua poin utama dan komited untuk tidak berkongsi kandungan kursus.',wcOk:'Sahkan Ditonton & Difahami — Buka Kunci Seterusnya',done:'Pelajaran Selesai',doneAt:'Selesai pada',prev:'Sebelumnya',next:'Pelajaran Seterusnya',ndaC:'Bilangan pengesahan',progL:'Kemajuan',csL:'Status',watched:'Selesai',unw:'Belum selesai',noRec:'Tiada rekod pembelajaran',total:'Jumlah pengesahan',times:'kali',vlL:'Bahasa Video',noVidT:'Versi bahasa ini belum dimuat naik',noVidD:'Admin sedang menyediakan versi ini. Sila pilih bahasa lain atau semak semula kemudian.',editVid:'Edit Video',vidStatus:'Status Video',cnV:'Video Cina',enV:'Video Inggeris',bmV:'Video Melayu',uploadT:'Muat Naik Video Kursus',uploadD:'Masukkan ID Video YouTube untuk setiap versi bahasa bagi setiap kursus. Ahli akan melihat versi yang sepadan dengan bahasa antara muka mereka.',ytHint:'Salin ID Video dari URL YouTube, cth: youtube.com/watch?v=ABC123xyz'},
+};
+
+var S={
+  lang:'cn',
+  users:JSON.parse(JSON.stringify(USERS0)),
+  courses:JSON.parse(JSON.stringify(COURSES)),
+  progress:{'4':{'c1':{watched:true,watchedAt:'2025-03-12'}},'5':{'c1':{watched:true,watchedAt:'2025-01-10'},'c2':{watched:true,watchedAt:'2025-01-11'},'c3':{watched:true,watchedAt:'2025-01-15'}}},
+  currentUser:null,loginError:'',
+  ndaSession:false,ndaA:false,ndaB:false,
+  tab:'members',editingVideo:null,
+  viewCourse:null,videoLang:'cn',wc1:false,wc2:false,
+  payModal:null,
+};
+
+function T(k){return(TX[S.lang]&&TX[S.lang][k])||k;}
+function ltag(l){return{basic:'tb',intermediate:'ti2',professional:'tp'}[l]||'';}
+function lpC(l){return{basic:'lv-basic',intermediate:'lv-inter',professional:'lv-pro'}[l]||'';}
+function llC(l){return{basic:'ll-basic',intermediate:'ll-inter',professional:'ll-pro'}[l]||'';}
+function catC(c){return c==='washing'?'tw':'tf';}
+function catThumb(c){return c==='washing'?'ct-wash':'ct-fridge';}
+function isW(uid,cid){return!!(S.progress[uid]&&S.progress[uid][cid]&&S.progress[uid][cid].watched);}
+function wAt(uid,cid){return(S.progress[uid]&&S.progress[uid][cid]&&S.progress[uid][cid].watchedAt)||'';}
+function mkW(uid,cid){if(!S.progress[uid])S.progress[uid]={};S.progress[uid][cid]={watched:true,watchedAt:new Date().toISOString().slice(0,10)};}
+function visCourses(u){var w=LW[u.level]||0;return S.courses.filter(function(c){return LW[c.level]<=w;});}
+function isAcc(u,cid){var vc=visCourses(u);var i=vc.findIndex(function(c){return c.id===cid;});if(i<0)return false;if(i===0)return true;return isW(u.id,vc[i-1].id);}
+function progOf(uid){var u=S.users.find(function(x){return x.id===uid;});if(!u||u.role!=='member')return{done:0,total:0};var vc=visCourses(u);return{done:vc.filter(function(c){return isW(uid,c.id);}).length,total:vc.length};}
+function vidId(c,lang){return(c.ytId&&c.ytId[lang])||'';}
+function ll(l){return l==='cn'?'华语':l==='en'?'English':'Bahasa Melayu';}
+
+function render(){document.getElementById('app').innerHTML=buildApp();}
+
+function buildApp(){
+  var cu=S.currentUser;
+  var needNda=cu&&cu.role==='member'&&!S.ndaSession;
+  return '<nav class="nav">'+
+    '<div class="nav-brand"><span>🔧</span><span>'+T('t')+'</span></div>'+
+    '<div class="nav-right">'+
+      '<div class="lang-wrap">'+
+        '<button class="lang-btn'+(S.lang==='cn'?' on':'')+'" id="lc">中文</button>'+
+        '<button class="lang-btn'+(S.lang==='en'?' on':'')+'" id="le">EN</button>'+
+        '<button class="lang-btn'+(S.lang==='bm'?' on':'')+'" id="lb">BM</button>'+
+      '</div>'+
+      (cu?'<button class="logout-btn" id="logoutBtn">⬅ '+T('logout')+'</button>':'')+
+    '</div>'+
+  '</nav>'+
+  '<div class="main">'+
+    (!cu?buildLogin():'')+
+    (cu&&(cu.role==='principal'||cu.role==='admin')?buildAdmin():'')+
+    (cu&&cu.role==='member'&&needNda?buildNda():'')+
+    (cu&&cu.role==='member'&&!needNda?(S.viewCourse?buildDetail():buildMember()):'')+
+  '</div>'+
+  (S.payModal?buildPayModal():'');
+}
+
+function buildLogin(){
+  return '<div class="login-wrap"><div class="login-card">'+
+    '<div class="login-logo"><span class="logo-icon">🏫</span><h2>'+T('t')+'</h2>'+
+    '<p>'+(S.lang==='cn'?'专业家电维修培训平台':S.lang==='en'?'Professional Appliance Repair Training':'Platform Latihan Pembaikan')+'</p></div>'+
+    (S.loginError?'<div class="err-box">⚠️ '+S.loginError+'</div>':'')+
+    '<div class="field"><label>'+T('email')+'</label><input id="em" type="email" placeholder="admin@test.com" autocomplete="email"/></div>'+
+    '<div class="field"><label>'+T('pw')+'</label><input id="pw" type="password" placeholder="admin123" autocomplete="current-password"/></div>'+
+    '<button class="login-btn" id="loginBtn">'+T('login')+'</button>'+
+    '<div class="hint-box"><div class="hint-title">💡 '+T('fill')+'</div>'+
+    S.users.map(function(u,i){
+      return '<div class="hint-row" data-fi="'+i+'">'+
+        '<span class="badge badge-'+u.role+'">'+TX.cn[u.role]+'</span>'+
+        '<span class="hint-em">'+u.name+'</span>'+
+        (u.status==='OFF'?'<span class="hint-note">（'+T('inactive')+'）</span>':'')+
+        (u.level!=='无'?'<span class="hint-note">'+TX.cn[u.level]+'</span>':'')+
+        (u.role==='member'?'<span class="hint-nda">✓ NDA×'+u.ndaCount+'</span>':'')+
+      '</div>';
+    }).join('')+
+    '</div></div></div>';
+}
+
+function buildNda(){
+  var cu=S.currentUser; var ready=S.ndaA&&S.ndaB;
+  return '<div class="nda-page">'+
+    '<div class="nda-alert"><div class="nda-alert-icon">🔒</div><div>'+
+    '<h3>'+T('ndaT')+'</h3><p>'+T('ndaSub')+'</p></div></div>'+
+    '<div class="nda-card">'+
+      '<div class="nda-card-hdr">📄 '+T('ndaT')+'</div>'+
+      '<div class="nda-clauses">'+
+        '<div class="nda-clause"><strong>'+T('c1h')+'</strong>'+T('c1')+'</div>'+
+        '<div class="nda-clause"><strong>'+T('c2h')+'</strong>'+T('c2')+'</div>'+
+        '<div class="nda-clause"><strong>'+T('c3h')+'</strong>'+T('c3')+'</div>'+
+        '<div class="nda-clause"><strong>'+T('c4h')+'</strong>'+T('c4')+'</div>'+
+      '</div></div>'+
+    '<div class="nda-agree-card">'+
+      '<label class="nda-chk-row" for="ndaA"><input type="checkbox" id="ndaA"'+(S.ndaA?' checked':'')+'/><span class="nda-chk-lbl">'+T('ckA')+'</span></label>'+
+      '<label class="nda-chk-row" for="ndaB"><input type="checkbox" id="ndaB"'+(S.ndaB?' checked':'')+'/><span class="nda-chk-lbl">'+T('ckB')+'</span></label>'+
+      '<button class="nda-agree-btn" id="ndaBtn"'+(ready?'':' disabled')+'>✅ '+T('agree')+'</button>'+
+      '<p class="nda-session-note">'+cu.name+' — '+T('total')+' '+cu.ndaCount+' '+T('times')+'</p>'+
+    '</div></div>';
+}
+
+function buildAdmin(){
+  var cu=S.currentUser;
+  return '<div>'+
+    '<div class="adm-hdr"><h2>🛡 '+T('dash')+'</h2>'+
+    '<span class="badge badge-'+cu.role+'" style="padding:5px 12px;font-size:13px">'+cu.name+' · '+T(cu.role)+'</span></div>'+
+    '<div class="tabs">'+
+      '<button class="tab'+(S.tab==='members'?' on':'')+'" id="tab-members">👥 '+T('members')+'</button>'+
+      '<button class="tab'+(S.tab==='payment'?' on':'')+'" id="tab-payment">💰 '+T('payment')+'</button>'+
+      '<button class="tab'+(S.tab==='progress'?' on':'')+'" id="tab-progress">📊 '+T('prog')+'</button>'+
+      '<button class="tab'+(S.tab==='courses'?' on':'')+'" id="tab-courses">🎬 '+T('courses')+'</button>'+
+    '</div>'+
+    (S.tab==='members'?buildMembersTab():'')+
+    (S.tab==='payment'?buildPayTab():'')+
+    (S.tab==='progress'?buildProgressTab():'')+
+    (S.tab==='courses'?buildCoursesTab():'')+
+  '</div>';
+}
+
+function buildMembersTab(){
+  return '<div class="card"><div class="tbl-wrap"><table>'+
+    '<thead><tr><th>'+T('nameL')+'</th><th>身份</th><th>'+T('lvL')+'</th><th>'+T('ndaC')+'</th><th>状态</th><th>操作</th></tr></thead>'+
+    '<tbody>'+S.users.map(function(u){return '<tr>'+
+      '<td><div class="fw">'+u.name+'</div><div class="mono">'+u.email+'</div></td>'+
+      '<td><span class="badge badge-'+u.role+'">'+T(u.role)+'</span></td>'+
+      '<td><span style="font-size:13px;color:var(--text2)">'+(u.level==='无'?'—':T(u.level))+'</span></td>'+
+      '<td>'+(u.role==='member'?'<span class="nda-pill">🛡 '+u.ndaCount+' '+T('times')+'</span>':'<span style="color:var(--text3)">—</span>')+'</td>'+
+      '<td><span class="'+(u.status==='ON'?'st-on':'st-off')+'"><span class="dot dot-'+(u.status==='ON'?'on':'off')+'"></span>'+(u.status==='ON'?T('on'):T('off'))+'</span></td>'+
+      '<td>'+(u.role==='principal'?'<span style="font-size:12px;color:var(--text3)">'+T('superAdmin')+'</span>':
+        '<button class="act-btn '+(u.status==='ON'?'r':'g')+'" data-toggle="'+u.id+'">'+(u.status==='ON'?T('revoke'):T('grant'))+'</button>')+
+    '</td></tr>';}).join('')+
+    '</tbody></table></div></div>'+
+    '<div class="tip-box">ℹ️ '+T('tipM')+'</div>';
+}
+
+function buildPayTab(){
+  var mems=S.users.filter(function(u){return u.role==='member';});
+  return '<div class="card"><div class="tbl-wrap"><table>'+
+    '<thead><tr><th>'+T('nameL')+'</th><th>'+T('lvL')+'</th><th>付款</th><th>'+T('dateL')+'</th><th>'+T('amtL')+'</th><th>操作</th></tr></thead>'+
+    '<tbody>'+mems.map(function(u){return '<tr>'+
+      '<td class="fw">'+u.name+'</td>'+
+      '<td><span class="tag '+ltag(u.level)+'">'+T(u.level)+'</span></td>'+
+      '<td>'+(u.paid?'<span class="paid-y">✓ '+T('paid')+'</span>':'<span class="paid-n">⏳ '+T('unpaid')+'</span>')+'</td>'+
+      '<td style="font-size:13px;color:var(--text2)">'+(u.paidDate||'—')+'</td>'+
+      '<td class="fw">'+(u.paidAmount||'—')+'</td>'+
+      '<td>'+(!u.paid?'<button class="act-btn b" data-paynow="'+u.id+'">💰 '+T('markPaid')+'</button>':'')+
+      '<button class="act-btn a" data-editpay="'+u.id+'">✏️ '+T('editPay')+'</button></td>'+
+    '</tr>';}).join('')+
+    '</tbody></table></div></div>'+
+    '<div class="tip-box">ℹ️ '+T('tipP')+'</div>';
+}
+
+function buildProgressTab(){
+  var mems=S.users.filter(function(u){return u.role==='member';});
+  return mems.map(function(u){
+    var p=progOf(u.id);var pct=p.total?Math.round(p.done/p.total*100):0;
+    var vc=visCourses(u);
+    return '<div class="prg-card">'+
+      '<div class="prg-hdr">'+
+        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+          '<span class="fw">'+u.name+'</span><span class="tag '+ltag(u.level)+'">'+T(u.level)+'</span>'+
+          '<span class="nda-pill">🛡 '+T('total')+' '+u.ndaCount+' '+T('times')+'</span>'+
+        '</div>'+
+        '<div style="text-align:right;flex-shrink:0"><div class="fw">'+p.done+'/'+p.total+'</div><div style="font-size:13px;color:var(--text2)">'+pct+'%</div></div>'+
+      '</div>'+
+      '<div class="prg-body">'+
+        '<div class="prog-wrap" style="margin-bottom:14px"><div class="prog-fill'+(pct===100?' done':'')+'" style="width:'+pct+'%"></div></div>'+
+        (vc.length===0?'<p style="font-size:14px;color:var(--text3)">'+T('noRec')+'</p>':
+          '<div class="tbl-wrap"><table class="prg-tbl">'+
+          '<thead><tr><th>课程</th><th>等级</th><th>'+T('csL')+'</th><th>'+T('doneAt')+'</th></tr></thead>'+
+          '<tbody>'+vc.map(function(c){
+            var w=isW(u.id,c.id);var wa=wAt(u.id,c.id);
+            return '<tr><td>'+c.title[S.lang]+'</td><td><span class="tag '+ltag(c.level)+'">'+T(c.level)+'</span></td>'+
+              '<td>'+(w?'<span class="done-pill">✓ '+T('watched')+'</span>':'<span style="font-size:12px;color:var(--text3)">— '+T('unw')+'</span>')+'</td>'+
+              '<td style="font-size:13px;color:var(--text2)">'+(wa||'—')+'</td></tr>';
+          }).join('')+
+          '</tbody></table></div>')+
+      '</div></div>';
+  }).join('');
+}
+
+function buildCoursesTab(){
+  return '<div>'+
+    '<div class="upload-info">'+
+      '<h3>🎬 '+T('uploadT')+'</h3>'+
+      '<p>'+T('uploadD')+'</p>'+
+      '<p style="font-size:12px;margin-top:6px;opacity:.8">💡 '+T('ytHint')+'</p>'+
+    '</div>'+
+    '<div class="card"><div class="tbl-wrap"><table>'+
+    '<thead><tr><th>类别</th><th>课程标题</th><th>等级</th>'+
+    '<th>🇨🇳 '+T('cnV')+'</th><th>🇬🇧 '+T('enV')+'</th><th>🇲🇾 '+T('bmV')+'</th><th>操作</th></tr></thead>'+
+    '<tbody>'+S.courses.map(function(c){
+      function vb(id){return id?'<span class="yt-badge has">✓ '+id.slice(0,8)+'…</span>':'<span class="yt-badge no">❌</span>';}
+      return '<tr>'+
+        '<td><span class="tag '+catC(c.cat)+'">'+T(c.cat)+'</span></td>'+
+        '<td class="fw" style="font-size:13px">'+c.title[S.lang]+'</td>'+
+        '<td><span class="tag '+ltag(c.level)+'">'+T(c.level)+'</span></td>'+
+        '<td>'+vb(vidId(c,'cn'))+'</td>'+
+        '<td>'+vb(vidId(c,'en'))+'</td>'+
+        '<td>'+vb(vidId(c,'bm'))+'</td>'+
+        '<td><button class="act-btn b" data-editvid="'+c.id+'">🎬 '+T('editVid')+'</button></td>'+
+      '</tr>';
+    }).join('')+
+    '</tbody></table></div></div>'+
+    (S.editingVideo?buildVideoForm(S.editingVideo):'')+
+  '</div>';
+}
+
+function buildVideoForm(cid){
+  var c=S.courses.find(function(x){return x.id===cid;});
+  if(!c)return '';
+  return '<div class="upload-form">'+
+    '<h3>🎬 '+T('editVid')+' — '+c.title[S.lang]+'</h3>'+
+    '<div class="vlang-section">'+
+      '<h4>YouTube Video ID</h4>'+
+      '<div class="vlang-row"><label>🇨🇳 华语</label><input id="vid-cn" placeholder="例：qp0ZNJAN6tA" value="'+vidId(c,'cn')+'"/></div>'+
+      '<div class="vlang-row"><label>🇬🇧 English</label><input id="vid-en" placeholder="e.g.: oPmr6boufmE" value="'+vidId(c,'en')+'"/></div>'+
+      '<div class="vlang-row"><label>🇲🇾 BM</label><input id="vid-bm" placeholder="cth: V-SyKZTnrb8" value="'+vidId(c,'bm')+'"/></div>'+
+    '</div>'+
+    '<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px">'+
+      '<button class="cancel-btn" id="cancelVidBtn">'+T('cancel')+'</button>'+
+      '<button class="save-btn" id="saveVidBtn" data-savevid="'+cid+'">💾 '+T('save')+'</button>'+
+    '</div></div>';
+}
+
+function buildMember(){
+  var cu=S.currentUser;
+  var vc=visCourses(cu);
+  var p=progOf(cu.id);var pct=p.total?Math.round(p.done/p.total*100):0;
+  var levels=['basic','intermediate','professional'].filter(function(l){return LW[l]<=(LW[cu.level]||0);});
+  return '<div>'+
+    '<div class="mem-hdr">'+
+      '<div><div class="fw" style="font-size:15px">'+cu.name+'</div>'+
+      '<div style="font-size:13px;color:var(--text2);margin-top:3px">'+T('curLv')+': <span class="lv-pill '+lpC(cu.level)+'">'+T(cu.level)+'</span></div></div>'+
+      '<div style="text-align:right;min-width:90px">'+
+        '<div class="fw" style="font-size:15px">'+p.done+'/'+p.total+'</div>'+
+        '<div class="prog-wrap" style="width:90px;margin-top:5px"><div class="prog-fill'+(pct===100?' done':'')+'" style="width:'+pct+'%"></div></div>'+
+        '<div style="font-size:12px;color:var(--text2);margin-top:3px">'+pct+'% '+T('progL')+'</div>'+
+      '</div>'+
+    '</div>'+
+    (vc.length===0?'<div class="empty">🔒<br>'+T('noCourse')+'</div>':'')+
+    levels.map(function(lv){
+      var lvc=vc.filter(function(c){return c.level===lv;});
+      if(!lvc.length)return '';
+      return '<div class="lv-group">'+
+        '<div class="lv-lbl '+llC(lv)+'">'+(lv==='basic'?'⭐':lv==='intermediate'?'🌟':'👑')+' '+T(lv)+'</div>'+
+        '<div class="course-grid">'+lvc.map(function(c){
+          var w=isW(cu.id,c.id);var acc=isAcc(cu,c.id);
+          return '<div class="ccard'+(acc?' click':' locked')+'" data-cid="'+c.id+'" data-acc="'+(acc?1:0)+'">'+
+            '<div class="cthumb '+catThumb(c.cat)+'">'+(acc?c.icon:'🔒')+'</div>'+
+            '<div class="cbody">'+
+              '<div class="ctags">'+
+                '<span class="tag '+catC(c.cat)+'">'+T(c.cat)+'</span>'+
+                '<span class="tag '+ltag(c.level)+'">'+T(c.level)+'</span>'+
+                (w?'<span class="done-pill">✓ '+T('watched')+'</span>':'')+
+                (!acc?'<span class="lock-pill">🔒</span>':'')+
+              '</div>'+
+              '<div class="ctitle">'+c.title[S.lang]+'</div>'+
+              '<button class="learn-btn" data-open="'+c.id+'"'+(acc?'':' disabled')+'>'+
+                (acc?(w?'🔄 '+T('review'):'▶ '+T('start')):'🔒 '+T('locked'))+
+              '</button>'+
+            '</div></div>';
+        }).join('')+'</div></div>';
+    }).join('')+
+  '</div>';
+}
+
+function buildDetail(){
+  var c=S.viewCourse;var cu=S.currentUser;
+  var kps=c.kp[S.lang]||[];
+  var w=isW(cu.id,c.id);var wa=wAt(cu.id,c.id);
+  var vc=visCourses(cu);var idx=vc.findIndex(function(x){return x.id===c.id;});
+  var hasPrev=idx>0;var hasNext=idx<vc.length-1;
+  var canNext=hasNext&&isAcc(cu,vc[idx+1].id);
+  var vl=S.videoLang;var vid=vidId(c,vl);
+  return '<div>'+
+    '<button class="back-btn" id="backBtn">← '+T('back')+'</button>'+
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">'+
+      '<span class="tag '+catC(c.cat)+'">'+T(c.cat)+'</span>'+
+      '<span class="tag '+ltag(c.level)+'">'+T(c.level)+'</span>'+
+      (w?'<span class="done-pill">✓ '+T('watched')+'</span>':'')+
+    '</div>'+
+    '<div class="detail-title">'+c.title[S.lang]+'</div>'+
+    '<div class="detail-layout">'+
+      '<div>'+
+        '<div class="vlang-bar">'+
+          '<span class="vlang-label">🌐 '+T('vlL')+':</span>'+
+          '<button class="vlang-btn'+(vl==='cn'?' on':'')+'" data-vl="cn">🇨🇳 华语</button>'+
+          '<button class="vlang-btn'+(vl==='en'?' on':'')+'" data-vl="en">🇬🇧 EN</button>'+
+          '<button class="vlang-btn'+(vl==='bm'?' on':'')+'" data-vl="bm">🇲🇾 BM</button>'+
+        '</div>'+
+        (vid?
+          '<div class="video-wrap"><iframe src="https://www.youtube.com/embed/'+vid+'?rel=0&modestbranding=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>':
+          '<div class="no-video-box"><span class="nv-icon">🎬</span><p><b>'+T('noVidT')+'</b><br>'+T('noVidD')+'</p></div>')+
+        '<div class="desc-card">'+c.desc[S.lang]+'</div>'+
+        (w?
+          '<div class="done-box"><span class="done-ico">✅</span><div><strong>'+T('done')+'</strong><small>'+T('doneAt')+': '+wa+'</small></div></div>':
+          '<div class="watch-box">'+
+            '<div class="watch-hdr">☑️ '+T('wcT')+'</div>'+
+            '<div class="watch-body">'+
+              '<p class="watch-desc">'+T('wcD')+'</p>'+
+              '<label class="wchk" for="wc1"><input type="checkbox" id="wc1"'+(S.wc1?' checked':'')+'/><span class="wchk-lbl">'+T('w1')+'</span></label>'+
+              '<label class="wchk" for="wc2"><input type="checkbox" id="wc2"'+(S.wc2?' checked':'')+'/><span class="wchk-lbl">'+T('w2')+'</span></label>'+
+              '<button class="confirm-btn" id="cfmBtn"'+(S.wc1&&S.wc2?'':' disabled')+' id="cfmBtn">✅ '+T('wcOk')+'</button>'+
+            '</div></div>')+
+        '<div class="nav-btns">'+
+          '<button class="nav-btn" id="prevBtn"'+(hasPrev?'':' disabled')+'>← '+T('prev')+'</button>'+
+          '<button class="nav-btn nxt" id="nextBtn"'+(canNext?'':' disabled')+'>'+T('next')+' →</button>'+
+        '</div>'+
+      '</div>'+
+      '<div><div class="kp-card"><h4>'+T('kp')+'</h4>'+
+        kps.map(function(k){return '<div class="kp-item"><span class="kp-dot"></span><span>'+k+'</span></div>';}).join('')+
+      '</div></div>'+
+    '</div></div>';
+}
+
+function buildPayModal(){
+  var u=S.payModal;
+  return '<div class="modal-ov" id="modalOv">'+
+    '<div class="modal">'+
+      '<h3>💰 '+T('markPaid')+' — '+u.name+'</h3>'+
+      '<div class="mf"><label>'+T('dateL')+'</label><input id="pmDate" type="date" value="'+(u.paidDate&&u.paidDate!=='—'?u.paidDate:new Date().toISOString().slice(0,10))+'"/></div>'+
+      '<div class="mf"><label>'+T('amtL')+'</label><input id="pmAmt" placeholder="RM 299" value="'+(u.paidAmount&&u.paidAmount!=='—'?u.paidAmount:'')+'"/></div>'+
+      '<div class="mf"><label>'+T('lvL')+'</label><select id="pmLv">'+
+        '<option value="basic"'+(u.level==='basic'?' selected':'')+'>'+T('basic')+'</option>'+
+        '<option value="intermediate"'+(u.level==='intermediate'?' selected':'')+'>'+T('intermediate')+'</option>'+
+        '<option value="professional"'+(u.level==='professional'?' selected':'')+'>'+T('professional')+'</option>'+
+      '</select></div>'+
+      '<div class="modal-acts">'+
+        '<button class="btn-sec" id="closeModal">'+T('cancel')+'</button>'+
+        '<button class="btn-pri" id="confirmPay">✓ 确认</button>'+
+      '</div></div></div>';
+}
+
+// ── EVENT DELEGATION (mobile-safe, no inline onclick) ──
+document.addEventListener('click',function(e){
+  var el=e.target;
+  // lang
+  if(el.id==='lc'){setLang('cn');return;}
+  if(el.id==='le'){setLang('en');return;}
+  if(el.id==='lb'){setLang('bm');return;}
+  // logout
+  if(el.id==='logoutBtn'){doLogout();return;}
+  // login
+  if(el.id==='loginBtn'){doLogin();return;}
+  // hint rows
+  if(el.closest('[data-fi]')){var r=el.closest('[data-fi]');fillCred(S.users[+r.dataset.fi].email,S.users[+r.dataset.fi].password);return;}
+  // tabs
+  if(el.id==='tab-members'){setTab('members');return;}
+  if(el.id==='tab-payment'){setTab('payment');return;}
+  if(el.id==='tab-progress'){setTab('progress');return;}
+  if(el.id==='tab-courses'){setTab('courses');return;}
+  // toggle member status
+  if(el.dataset.toggle){toggleUser(el.dataset.toggle);return;}
+  // pay
+  if(el.dataset.paynow){S.payModal=S.users.find(function(u){return u.id===el.dataset.paynow;});render();return;}
+  if(el.dataset.editpay){S.payModal=S.users.find(function(u){return u.id===el.dataset.editpay;});render();return;}
+  if(el.id==='closeModal'){S.payModal=null;render();return;}
+  if(el.id==='modalOv'&&e.target===el){S.payModal=null;render();return;}
+  if(el.id==='confirmPay'){confirmPay();return;}
+  // edit video
+  if(el.dataset.editvid){S.editingVideo=el.dataset.editvid;render();setTimeout(function(){var i=document.getElementById('vid-cn');if(i)i.focus();},50);return;}
+  if(el.id==='cancelVidBtn'){S.editingVideo=null;render();return;}
+  if(el.dataset.savevid){saveVids(el.dataset.savevid);return;}
+  if(el.id==='saveVidBtn'){var b=document.querySelector('[data-savevid]');if(b)saveVids(b.dataset.savevid);return;}
+  // NDA
+  if(el.id==='ndaA'){S.ndaA=el.checked;updNda();return;}
+  if(el.id==='ndaB'){S.ndaB=el.checked;updNda();return;}
+  if(el.id==='ndaBtn'){agreeNda();return;}
+  // open course card or button
+  var card=el.closest('[data-cid]');
+  if(card&&card.dataset.acc==='1'){openCourse(card.dataset.cid);return;}
+  if(el.dataset.open&&el.dataset.open!=='undefined'){openCourse(el.dataset.open);return;}
+  // back
+  if(el.id==='backBtn'){S.viewCourse=null;render();window.scrollTo(0,0);return;}
+  // video lang
+  if(el.dataset.vl){S.videoLang=el.dataset.vl;render();return;}
+  // watched checkboxes
+  if(el.id==='wc1'){S.wc1=el.checked;updCfm();return;}
+  if(el.id==='wc2'){S.wc2=el.checked;updCfm();return;}
+  if(el.id==='cfmBtn'){confirmWatched();return;}
+  // prev/next lesson
+  if(el.id==='prevBtn'){navC(-1);return;}
+  if(el.id==='nextBtn'){navC(1);return;}
+},true);
+
+// Enter key on login
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&(document.activeElement.id==='em'||document.activeElement.id==='pw'))doLogin();
+});
+
+function updNda(){var b=document.getElementById('ndaBtn');if(b)b.disabled=!(S.ndaA&&S.ndaB);}
+function updCfm(){var b=document.getElementById('cfmBtn');if(b)b.disabled=!(S.wc1&&S.wc2);}
+
+function agreeNda(){
+  if(!S.ndaA||!S.ndaB)return;
+  S.users=S.users.map(function(u){return u.id===S.currentUser.id?Object.assign({},u,{ndaCount:u.ndaCount+1}):u;});
+  S.currentUser=Object.assign({},S.currentUser,{ndaCount:S.currentUser.ndaCount+1});
+  S.ndaSession=true;S.videoLang=S.lang;render();
+}
+
+function saveVids(cid){
+  var cn=document.getElementById('vid-cn').value.trim();
+  var en=document.getElementById('vid-en').value.trim();
+  var bm=document.getElementById('vid-bm').value.trim();
+  S.courses=S.courses.map(function(c){return c.id===cid?Object.assign({},c,{ytId:{cn:cn,en:en,bm:bm}}):c;});
+  S.editingVideo=null;render();
+  alert(S.lang==='cn'?'✓ 视频 ID 已保存！':S.lang==='en'?'✓ Video IDs saved!':'✓ ID Video disimpan!');
+}
+
+function confirmWatched(){
+  var cu=S.currentUser,c=S.viewCourse;
+  mkW(cu.id,c.id);
+  var vc=visCourses(cu);var idx=vc.findIndex(function(x){return x.id===c.id;});
+  if(idx<vc.length-1){S.viewCourse=vc[idx+1];S.wc1=false;S.wc2=false;}
+  else{S.viewCourse=null;}
+  render();window.scrollTo(0,0);
+}
+
+function navC(dir){
+  var cu=S.currentUser;var vc=visCourses(cu);
+  var idx=vc.findIndex(function(x){return x.id===S.viewCourse.id;});
+  var ni=idx+dir;
+  if(ni>=0&&ni<vc.length&&isAcc(cu,vc[ni].id)){S.viewCourse=vc[ni];S.wc1=false;S.wc2=false;render();window.scrollTo(0,0);}
+}
+
+function setLang(l){S.lang=l;if(S.ndaSession)S.videoLang=l;render();}
+function setTab(t){S.tab=t;S.editingVideo=null;render();}
+function fillCred(em,pw){var e=document.getElementById('em'),p=document.getElementById('pw');if(e)e.value=em;if(p)p.value=pw;}
+function doLogout(){S.currentUser=null;S.viewCourse=null;S.ndaSession=false;S.ndaA=false;S.ndaB=false;S.wc1=false;S.wc2=false;render();}
+function toggleUser(id){
+  S.users=S.users.map(function(u){
+    if(u.id===id){var ns=u.status==='ON'?'OFF':'ON';if(S.currentUser&&S.currentUser.id===id&&ns==='OFF')S.currentUser=null;return Object.assign({},u,{status:ns});}return u;
+  });render();
+}
+function openCourse(id){
+  var c=S.courses.find(function(x){return x.id===id;});
+  if(c&&isAcc(S.currentUser,c.id)){S.viewCourse=c;S.wc1=false;S.wc2=false;S.videoLang=S.lang;render();window.scrollTo(0,0);}
+}
+function confirmPay(){
+  var d=document.getElementById('pmDate').value,a=document.getElementById('pmAmt').value,lv=document.getElementById('pmLv').value;
+  S.users=S.users.map(function(u){return u.id===S.payModal.id?Object.assign({},u,{paid:true,paidDate:d,paidAmount:a,level:lv}):u;});
+  S.payModal=null;render();
+}
+function doLogin(){
+  var em=document.getElementById('em');var pw=document.getElementById('pw');
+  if(!em||!pw)return;
+  var user=S.users.find(function(u){return u.email===em.value&&u.password===pw.value;});
+  if(!user){S.loginError=T('wrongPw');render();return;}
+  if(user.role!=='principal'&&user.status==='OFF'){S.loginError=T('noAuth');render();return;}
+  S.currentUser=Object.assign({},user);S.loginError='';
+  S.ndaSession=false;S.ndaA=false;S.ndaB=false;S.wc1=false;S.wc2=false;S.viewCourse=null;S.videoLang=S.lang;
+  render();window.scrollTo(0,0);
+}
+
+render();
+</script>
+</body>
+</html>
